@@ -11,11 +11,12 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-
+    
+    // define a tabela que o laravel irá fazer a busca pelos dados
     protected $table = "UsuPor";
 
     /**
-     * The attributes that are mass assignable.
+     * Atributos que são atribuidos para o WHERE na busca, não obrigatóriamente deve usar todos
      *
      * @var array<int, string>
      */
@@ -26,7 +27,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Os atributos que devem ser ocultados afim de evitar vazamento de conteúdo sensível.
      *
      * @var array<int, string>
      */
