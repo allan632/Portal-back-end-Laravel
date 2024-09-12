@@ -16,5 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('user', [AuthController::class, 'user']);
-Route::get('users', [AuthController::class, 'obterUsuarios']);
-Route::post('registro', [AuthController::class, 'registro']);
+Route::get('obterUsuarios', [AuthController::class, 'obterUsuarios']);
+Route::post('register', [AuthController::class, 'register']);
+
+Route::post('login', [AuthController::class, 'login']);
