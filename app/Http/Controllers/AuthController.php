@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Cookie;
 
 class AuthController extends Controller
 {
@@ -37,6 +38,14 @@ class AuthController extends Controller
         return $decryptedPassword;
     }
 
+    // Função responsável por pegar todos os usário cadastrados do banco de dados, sem válidar se é ativou o inativo
+    public function obterUsuarios()
+    {
+        $users = User::all();
+
+        return $users;
+    }
+
     // Função de registro para salvar o usuário com a senha criptografada
     public function register(Request $request)
     {
@@ -56,12 +65,16 @@ class AuthController extends Controller
     // Busca o usuário para validar se existe, caso não exista ele irá parar a função e retornar uma mensagem de "Usuário não encontrado"
     // Caso encontre o usuário irá validar se a senha colocada pelo usuário é igual a senha buscada pelo banco e desencriptada
     // Caso a senha esteja incorreta irá retornar uma mensagem de "Senha incorreta", do contrário ele irá retornar o bem vindo.
-    public function login(Request $request)
-    {
+  
+    public function login(Request $request){
+
         $login = $request->input('DsLogin');
         $senha = $request->input('DsSenha');
 
         $user = User::where('DsLogin', $login)->first();
+        $token = md5($login);
+        
+        $cookie = cookie('PHPSESSID', $token, 60);
 
         if (!$user) {
             return response([
@@ -73,17 +86,33 @@ class AuthController extends Controller
 
         if ($decryptedPassword === $senha) {
             Auth::login($user);
-            return response(['message' => 'Login bem-sucedido'], Response::HTTP_OK);
-        } else {
-            return response(['message' => 'Senha incorreta'], Response::HTTP_UNAUTHORIZED);
+        
+            $cookie = cookie('jwt', $token, 60);
+            return response([
+                'message' => 'Success',
+                'token' => $token,
+                'user' => $login,
+            ])
+            ->cookie(($cookie), Response::HTTP_ACCEPTED)
+            ->header('Content-Type', 'application/json');
+            
         }
+        // else if($user && $user !== 'SUPERVISOR' && $senha === '12345'){
+        //     return response()->json([
+        //         'message' => 'É necessário alterar a sua senha padrão.',
+        //         'redirect' => '/nova-senha'
+        //     ], 302);
+        // } 
+        else {
+            return response(['message' => 'Login ou senha incorretos'], Response::HTTP_UNAUTHORIZED);
+        }
+        return response(['message' => 'Login ou senha incorretos'], Response::HTTP_UNAUTHORIZED);
     }
 
-    // Função responsável por pegar todos os usário cadastrados do banco de dados, sem válidar se é ativou o inativo
-    public function obterUsuarios()
-    {
-        $users = User::all();
-
-        return $users;
+    // Invalida a sessão do usuário autenticado
+    public function logout() {
+        Cookie::forget('token'); // Retira o token do usuário para deslogar
+        return response()->json(['message' => 'Logout realizado com sucesso.'], Response::HTTP_OK);
     }
+    
 }

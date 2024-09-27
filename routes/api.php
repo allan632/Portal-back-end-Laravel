@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\Authenticate;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,8 +15,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('user', [AuthController::class, 'user']);
-Route::get('obterUsuarios', [AuthController::class, 'obterUsuarios']);
-Route::post('register', [AuthController::class, 'register']);
+Route::middleware(Authenticate::class)->group(function () {
+    Route::get('/', [AuthController::class, view('welcome')]);
+    Route::get('user', [AuthController::class, 'user']);
+    Route::get('obterUsuarios', [AuthController::class, 'obterUsuarios']);
+    Route::post('register', [AuthController::class, 'register']);
+});
 
+Route::post('logout', [AuthController::class, 'logout']);
 Route::post('login', [AuthController::class, 'login']);
