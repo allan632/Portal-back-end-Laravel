@@ -67,8 +67,7 @@ class AuthController extends Controller
     // Caso a senha esteja incorreta irá retornar uma mensagem de "Senha incorreta", do contrário ele irá retornar o bem vindo.
   
     public function login(Request $request){
-
-        $login = $request->input('DsLogin');
+	$login = $request->input('DsLogin');
         $senha = $request->input('DsSenha');
 
         $user = User::where('DsLogin', $login)->first();
