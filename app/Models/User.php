@@ -24,6 +24,14 @@ class User extends Authenticatable
         'NrFun',
         'DsLogin',
         'DsSenha',
+        // 'DsAbastTalao',
+        // 'NrFun',
+        // 'IdFunWMS',
+        // 'DsAbastTalaoEx',
+        // 'DsNome',
+        // 'DsGru',
+        // 'CdGru',
+        // 'CdEmpresa'
     ];
 
     /**
