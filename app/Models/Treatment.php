@@ -21,9 +21,8 @@ class Treatment extends Model
     protected $fillable = [
         'CdTratativa',
         'CdEvento',
-        'CdRemetente',
+        'CdRemetente', // embarcador
         'CdFuncionario',
-        // 'CdTratativa',
         'InStatus',
         'DtTratativa'
     ];
@@ -37,7 +36,7 @@ class Treatment extends Model
     // public function events(): HasMany {
     //     return $this->hasMany(Event::class, 'CdEvento');
     // }
-      public function occurrences(): HasMany {
+    public function occurrences(): HasMany {
         return $this->hasMany(SacTratOccurrence::class, 'CdTratativa');
     }
 }
