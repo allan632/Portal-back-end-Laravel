@@ -9,17 +9,17 @@
 ## .env
 - php artisan key:generate
 
-- DB_CONNECTION=sqlsrv
+- DB_CONNECTION=
 
-- DB_HOST=172.16.100.14
+- DB_HOST=
 
-- DB_PORT=1433
+- DB_PORT=
 
-- DB_DATABASE=Portal
+- DB_DATABASE=
 
-- DB_USERNAME=Renovacao
+- DB_USERNAME=
 
-- DB_PASSWORD="@dbRenovacao22#"
+- DB_PASSWORD=
 
 ## Rodar o projeto
 - php artisan serve
