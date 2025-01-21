@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+
 class AuthController extends Controller
 {
     // Função para encriptar a senha usando OpenSSL
@@ -25,33 +27,25 @@ class AuthController extends Controller
     }
 
     public function loginAuth(Request $request){
-
+        $loginName = $request->input('DsLogin');
+        $loginPassword = $request->input('DsSenha');
          // Validação
+        $user = User::where('name', $loginName)->first();
+         
+        if (!$user) return response(["message" => "Usuário não encontrado"], ); #Response::HTTP_UNAUTHORIZED
 
         
-        
+        if(Hash::check($loginPassword, $user->password)) 
+        {
+            $token = $user->createToken('remember_token');
+            $encryptedToken = Crypt::encryptString($token);
 
-        
-        // Verificar as credenciais
-        if (Auth::attempt(['email' => $request->input("DsEmail"), 'password' => $request->input("DsSenha")])) {
-
-            // Gerar token
-            $token = $request->user()->createToken('NomeDoSeuApp')->plainTextToken;
-
-            // Retornar token como resposta
-            return response()->json([
-                'token' => $token,
-            ]);
-        }
-
-        $credentials = $request->only('DsEmail', 'DsSenha');
-
-        if (Auth::attempt($credentials)) {
-            $token = $request->user()->createToken('Token Name')->plainTextToken;
             return response()->json(['token' => $token], 200);
         }
+        
+         
     
-        return response()->json(['error' => 'Credenciais inválidas'], 401);
+        return response()->json(['error' => " Credenciais inválidas"], 401);
     }
 
 }
