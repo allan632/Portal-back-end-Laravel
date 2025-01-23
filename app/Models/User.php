@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Carbon;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -72,9 +72,13 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'DsSenha'=> 'hashed',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+
 
     ];
-    
+
+        /**
+     * The storage format of the model's date columns.
+     *
+     * @var string
+     */
 }
