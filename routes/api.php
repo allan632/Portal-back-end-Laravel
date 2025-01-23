@@ -28,11 +28,13 @@ Route::get('/', function (Request $request) {
 
 Route::post('/register',[AuthController::class,"registerAuth"]);
 
-Route::post('/login', function (Request $request) {
-    
-});
+Route::post('/login', [AuthController::class,"loginAuth"]);
+
+
 Route::middleware('auth:api')->group(function () {
     Route::get('/profile', function () {
         return response()->json(Auth::user());
     });
+    Route::post("/logout",[AuthController::class,"logoutAuth"]);
+
 });
