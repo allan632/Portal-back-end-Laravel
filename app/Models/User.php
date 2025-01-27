@@ -43,14 +43,16 @@ class User extends Authenticatable implements JWTSubject
      * @var array<int, string>
      */
     protected $fillable = [
-        'DsLogin',
-        'DsSenha',
         'IdFunWMS',
+        'DsLogin',
+        'password',
+        'DsSenha',
         'CdSideBar',
+        'DsAbastTalaoEx',
+        'DsAbastTalao',
+        'remember_token',
         'updated_at',
         'created_at',
-        'remember_token',
-        'password'
     ];
 
     /**

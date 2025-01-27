@@ -12,12 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->increments("NrFun");
+            $table->string("NrFun")->nullable();
             $table->string('DsLogin');
             $table->string('IdFunWMS');
             $table->integer('CdSideBar');
             $table->string('DsSenha');
-            $table->rememberToken();
             $table->timestamps();
         });
     }
