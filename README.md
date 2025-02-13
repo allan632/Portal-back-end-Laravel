@@ -83,13 +83,72 @@ Siga os passos abaixo para configurar e executar o projeto localmente:
 - **spatie/laravel-ignition**: ^2.0 - Ferramenta de depuração para aplicações Laravel.
 
 ## Rotas Principais
+### Users
 
-### Registro de Usuário
-- **POST /register**: Registra um novo usuário.
+**POST HTTP /register**
+-   Discrição: Registra um novo usuário e linca num perfil ja existente.
+-   Acessos: admin
 
-### Login de Usuário
-- **POST /login**: Realiza o login do usuário e retorna um JWT para autenticação.
+##   Request
 
+#   Header
+   ```json
+      {
+         "Content-Type":"application/json",
+         "Authorization": "Bearer JWT_TOKEN",
+      },
+   ```
+ #  Body
+   ```json
+      {
+         "NrFun":"123213123",
+         "DsLogin":"joao",
+         "DsSenha":"12345678",
+         "profile_name":"admin",
+         "access_level":"3"
+      }
+   ```
+**POST HTTP /login**
+-   Discrição: Realiza o login do usuário e retorna um JWT para autenticação.
+-   Acessos: Admin
+
+##  Request
+
+#   Header
+   ```json
+   {
+	   "DsLogin":"allan",
+	   "DsSenha":"12345678"
+   }
+   ```
+### Profiles
+
+**POST HTTP /register/profile**
+-  Discrição: Cria um perfil de usuario
+-  Acessos: admin
+#  Header
+   ```json
+      {
+         "Content-Type":"application/json",
+         "Authorization": "Bearer JWT_TOKEN"
+      }
+   ```
+#  Body
+   ```json
+      {
+      "nameProfile":"admin",
+      "accessLevel":"3"
+      }
+   ```
+**GET HTTP /profile**
+-   Acessos: admin
+#   Header
+   ```json
+      {
+         "Content-Type":"application/json",
+         "Authorization": "Bearer JWT_TOKEN"
+      },
+   ```
 
 ## Autenticação
 
@@ -103,3 +162,27 @@ A autenticação na API é realizada utilizando JWT (JSON Web Token). Após o lo
 ## Conclusão
 
 Essa API oferece um fluxo básico de autenticação usando JWT, permitindo registro e login de usuários. Para acessar as rotas protegidas, o token de autenticação deve ser incluído no cabeçalho da requisição.
+Passo a passo para Rodar
+
+
+## Limpar cache
+
+- php artisan cache:clear && php artisan config:clear && php artisan route:clear && php artisan serve
+
+## Cachear 
+
+- php artisan config:cache && php artisan route:cache
+
+## Debug está Desativado
+
+- APP_DEBUG=false
+
+## Log em Arquivo em Vez de Tela
+
+- LOG_CHANNEL=daily
+
+## Rodar
+
+   php artisan serve
+
+

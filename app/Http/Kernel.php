@@ -6,6 +6,12 @@ use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
 {
+
+    protected $routeMiddleware = [
+        'profile' => \App\Http\Middleware\CheckProfile::class,
+        'prioritProfile' => \App\Http\Middleware\CheckProfile::class,
+
+    ];
     /**
      * The application's global HTTP middleware stack.
      *
@@ -14,13 +20,13 @@ class Kernel extends HttpKernel
      * @var array<int, class-string|string>
      */
     protected $middleware = [
-        // \App\Http\Middleware\TrustHosts::class,
-        \App\Http\Middleware\TrustProxies::class,
-        \Illuminate\Http\Middleware\HandleCors::class,
-        \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
-        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-        \App\Http\Middleware\TrimStrings::class,
-        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        // \App\Http\Middleware\TrustHosts::class, //Permite definir quais hosts são confiáveis para acessar a aplicação.
+        \App\Http\Middleware\TrustProxies::class, //Gerencia reverse proxies (como Cloudflare, AWS ELB, Nginx).
+        \Illuminate\Http\Middleware\HandleCors::class, //Lida com CORS (Cross-Origin Resource Sharing), que controla quais origens externas podem acessar sua API.
+        \App\Http\Middleware\PreventRequestsDuringMaintenance::class, //Impede que usuários acessem a aplicação quando o Laravel está no modo de manutenção (php artisan down).
+        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class, // Valida o tamanho máximo de dados que podem ser enviados por POST.
+        \App\Http\Middleware\TrimStrings::class, // Remove espaços extras no início e fim de strings em requisições.
+        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class, // Converte strings vazias ("") em valores NULL no banco de dados automaticamente.
     ];
 
     /**
@@ -29,19 +35,12 @@ class Kernel extends HttpKernel
      * @var array<string, array<int, class-string|string>>
      */
     protected $middlewareGroups = [
-        'web' => [
-            \App\Http\Middleware\EncryptCookies::class,
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \Illuminate\Session\Middleware\StartSession::class,
-            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \App\Http\Middleware\VerifyCsrfToken::class,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        ],
 
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             'throttle:api',
+            'throttle:60,1', 
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];

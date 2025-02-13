@@ -1,14 +1,11 @@
 <?php
 
-use App\Models\User;
-
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PalletController;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Laravel\Sanctum\PersonalAccessTokenResult;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +19,7 @@ use Laravel\Sanctum\PersonalAccessTokenResult;
 */
 
 
-Route::get('/', function (Request $request) {
+Route::put('/', function (Request $request) {
     return response()->json(['message' => "hello word"]);
 });
 
@@ -30,11 +27,20 @@ Route::post('/register',[AuthController::class,"registerAuth"]);
 
 Route::post('/login', [AuthController::class,"loginAuth"]);
 
+Route::middleware('auth:api','profile:admin')->group(function () {
+    Route::get('/profile', [ProfileController::class, "viewProfile"]);
 
-Route::middleware('auth:api')->group(function () {
-    Route::get('/profile', function () {
-        return response()->json(Auth::user());
-    });
     Route::post("/logout",[AuthController::class,"logoutAuth"]);
+    Route::post('/register/profile',[ProfileController::class, "createProfile"]);
+    Route::put('/link/profile/user',[ProfileController::class, "linkProfileToUser"]);
 
+});
+
+Route::middleware('auth:api','profile:PalletController')->group(function () {
+    Route::put('/register/entry/pallet',[PalletController::class, "createEntryPallet"]);
+
+});
+
+Route::middleware(['auth:api'])->group(function () {
+    Route::get('/auth/verify', [AuthController::class,"verifyToken"]);
 });

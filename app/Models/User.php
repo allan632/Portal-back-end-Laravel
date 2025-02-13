@@ -3,7 +3,8 @@
 namespace App\Models;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Carbon;
+
+use App\Models\PalletEntryExit;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
@@ -13,7 +14,12 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable implements JWTSubject
 {
     use Notifiable;
-    protected $primaryKey = 'NrFun'; 
+
+    public function Entry()
+    {
+        return $this->hasMany(PalletEntryExit::class, 'NrFun');
+    }
+
     // Rest omitted for brevity
 
     /**
@@ -21,6 +27,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return mixed
      */
+    //configuração de jwt token
     public function getJWTIdentifier()
     {
         return $this->getKey(); // Substitua por seu campo de identificação
@@ -36,17 +43,22 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
+    //desabilita o timestamp de ir automatico
     public $timestamps = false; // Habilita timestamps
+
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
+
+        //lista de atributos da tabela
     protected $fillable = [
+        'NrFun',
         'IdFunWMS',
         'DsLogin',
         'password',
-        'DsSenha',
         'CdSideBar',
         'DsAbastTalaoEx',
         'DsAbastTalao',
@@ -60,9 +72,9 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array<int, string>
      */
+    //atrui
     protected $hidden = [
-        'DsSenha',
-        'remember_token',
+        'password'
     ];
 
     /**
@@ -78,9 +90,14 @@ class User extends Authenticatable implements JWTSubject
 
     ];
 
-        /**
+    /**
      * The storage format of the model's date columns.
      *
      * @var string
      */
+    //Avisa a model sobre a relacao com profiles e quais sao a chaves
+     public function profiles()
+     {
+         return $this->belongsToMany(Profile::class, 'profile_user', 'user_fk', 'profile_fk');
+     }
 }

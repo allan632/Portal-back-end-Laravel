@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação de Rotas API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+        
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .route {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e3e3e3;
+            border-left: 5px solid #007bff;
+            border-radius: 5px;
+        }
+        .method {
+            font-weight: bold;
+            color: #d63384;
+        }
+        pre {
+            background: #222;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📌 Documentação de Rotas da API</h1>
+
+        <div class="route">
+            <p><span class="method">POST</span> <strong>/register</strong></p>
+            <p><strong>Descrição:</strong> Registra um novo usuário e vincula a um perfil existente.</p>
+            <p><strong>User:</strong> admin</p>
+            <p><strong>Header:</strong></p>
+            <pre>{
+    "Content-Type": "application/json",
+    "Authorization": "Bearer JWT_TOKEN"
+}</pre>
+            <p><strong>Body:</strong></p>
+            <pre>{
+    "NrFun": "123213123",
+    "DsLogin": "joao",
+    "DsSenha": "12345678",
+    "profile_name": "admin",
+    "access_level": "3"
+}</pre>
+        </div>
+
+        <div class="route">
+            <p><span class="method">POST</span> <strong>/login</strong></p>
+            <p><strong>Descrição:</strong> Realiza o login do usuário e retorna um JWT para autenticação.</p>
+            <p><strong>User:</strong> admin</p>
+            <p><strong>Header:</strong></p>
+            <pre>{
+    "Content-Type": "application/json",
+    "Authorization": "Bearer JWT_TOKEN"
+}</pre>
+                <p><strong>Body:</strong></p>
+                <pre>{
+                    "DsLogin":"allan",
+                    "DsSenha":"12345678"
+}</pre>
+           
+        </div>
+
+        <div class="route">
+            <p><span class="method">POST</span> <strong>/register/profile</strong></p>
+            <p><strong>Descrição:</strong> Cria um perfil de usuário.</p>
+            <p><strong>User:</strong> admin</p>
+            <p><strong>Header:</strong></p>
+            <pre>{
+    "Content-Type": "application/json",
+    "Authorization": "Bearer JWT_TOKEN"
+}</pre>
+            <p><strong>Body:</strong></p>
+            <pre>{
+    "nameProfile": "admin",
+    "accessLevel": "3"
+}</pre>
+        </div>
+
+        <div class="route">
+            <p><span class="method">GET</span> <strong>/profile</strong></p>
+            <p><strong>Descrição:</strong> Obtém os perfis de usuário.</p>
+            <p><strong>User:</strong> admin</p>
+            <p><strong>Header:</strong></p>
+            <pre>{
+                "Content-Type": "application/json",
+                "Authorization": "Bearer JWT_TOKEN"
+            }</pre>
+        </div>
+
+    </div>
+</body>
+</html>
