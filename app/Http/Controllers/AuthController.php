@@ -86,7 +86,7 @@ class AuthController extends Controller
 
     public function verifyToken(Request $req){
         
-        return response()->json([$req->user()],201);
+        return response()->json(["user"=>"sucess"],201);
     }
 
     public function logoutAuth()

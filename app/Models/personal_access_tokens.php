@@ -31,5 +31,7 @@ class Personal_access_tokens extends Model
      *
      * @var string
      */
+
+     
     protected $table = 'personal_access_tokens';
 }
