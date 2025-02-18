@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
 Route::put('/', function (Request $request) {
     return response()->json(['message' => "hello word"]);
 });
@@ -37,7 +36,9 @@ Route::middleware('auth:api','profile:admin')->group(function () {
 });
 
 Route::middleware('auth:api','profile:PalletController')->group(function () {
-    Route::put('/register/entry/pallet',[PalletController::class, "createEntryPallet"]);
+    Route::post('/register/entry/palletData',[PalletController::class, "registerEntryPallet"]);
+    Route::post('/register/entry/palletPhoto',[PalletController::class, "registerPhoto"]);
+    Route::post('/test',[PalletController::class, "test"]);
 
 });
 

@@ -6,16 +6,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 
-class QtdPaleteDoc extends Model
+class QtdPaleteFisica extends Model
 {
     use HasFactory;
 
-    protected $table = 'QtdPaleteDoc';
-
+    protected $table = 'QtdFisica';
     public $timestamps = false; // Mantém created_at e updated_at
 
     protected $fillable = [
-        'IdDoc', 'TpPalet', 'QtdPalete'
+        'IdDoc',
+        'TpPalet',
+        'QtdPalete',
     ];
 
     public function palletEntryExit()

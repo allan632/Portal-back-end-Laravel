@@ -126,6 +126,12 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+        //canal de log para request HTTP
+        'http_logs' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/http_requests.log'),
+            'level' => 'info',
+        ],
     ],
 
 ];

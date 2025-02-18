@@ -24,7 +24,9 @@ class PalletEntryExit extends Model
         'CNPJDestinatario',
         'FilialRecebedoura',
         'NrFun',
-        'created_at'
+        'DataEmissaoDoc',
+        'DataRegistro'
+       
     ];
 
     public function user()
@@ -32,9 +34,9 @@ class PalletEntryExit extends Model
         return $this->hasMany(User::class, 'NrFun'); 
     }
 
-    public function qtdDoc()
+    public function qtdPaleteFisica()
     {
-        return $this->hasMany(QtdDoc::class, 'IdDoc'); 
+        return $this->hasMany(QtdPaleteFisica::class, 'IdDoc'); 
     }
 
     public function qtdPaleteDoc()
@@ -47,12 +49,5 @@ class PalletEntryExit extends Model
         return $this->hasMany(FtDocAuxiliar::class, 'IdDoc');
     }
 
-    public function setDataRegistroAttribute($value)
-{
-    $this->attributes['created_at'] = Carbon::parse($value)->format('Y-m-d H:i:s');
-}
-    protected $casts = [
-        'created_at' => 'datetime:Y-m-d H:i:s', // Formato ISO para SQL Server
-        // Outros campos...
-    ];
+
 }
