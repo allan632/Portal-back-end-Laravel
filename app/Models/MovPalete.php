@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
 
-class PalletEntryExit extends Model
+class MovPalete extends Model
 {
     use HasFactory;
 
-    protected $table = 'EntradaSaida';
+    protected $table = 'MovPalete';
     protected $primaryKey = 'IdDoc';
     public $timestamps = false; // Mantém created_at e updated_at
     protected $fillable = [
@@ -25,8 +25,8 @@ class PalletEntryExit extends Model
         'FilialRecebedoura',
         'NrFun',
         'DataEmissaoDoc',
-        'DataRegistro'
-       
+        'DataRegistro',
+        'TpProc'
     ];
 
     public function user()
@@ -34,19 +34,19 @@ class PalletEntryExit extends Model
         return $this->hasMany(User::class, 'NrFun'); 
     }
 
-    public function qtdPaleteFisica()
+    public function movPaleteQtdFisica()
     {
-        return $this->hasMany(QtdPaleteFisica::class, 'IdDoc'); 
+        return $this->hasMany(MovPaleteQtdFisica::class, 'IdDoc'); 
     }
 
     public function qtdPaleteDoc()
     {
-        return $this->hasMany(QtdPaleteDoc::class, 'IdDoc');
+        return $this->hasMany(MovPaleteQtdDoc::class, 'IdDoc');
     }
 
-    public function ftDocAuxiliar()
+    public function movPaleteAnexoDoc()
     {
-        return $this->hasMany(FtDocAuxiliar::class, 'IdDoc');
+        return $this->hasMany(MovPaleteAnexoDoc::class, 'IdDoc');
     }
 
 

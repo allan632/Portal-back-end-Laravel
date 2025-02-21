@@ -89,10 +89,23 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
+
+            
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
-
+        'Portal' => [
+            'driver' => 'sqlsrv',
+            'url' => '',
+            'host' => '172.16.100.14',
+            'port' => '1433',
+            'database' => 'Portal', 'forge',
+            'username' => 'Renovacao',
+            'password' => "@dbRenovacao22#",
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+        ]
     ],
 
     /*

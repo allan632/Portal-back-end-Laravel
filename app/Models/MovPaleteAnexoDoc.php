@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
 
-class FtDocAuxiliar extends Model
+class MovPaleteAnexoDoc extends Model
 {
     use HasFactory;
 
-    protected $table = 'FtDocAuxiliar';
-
+    protected $table = 'MovPaleteAnexoDoc';
+    
     public $timestamps = false; // Mantém created_at e updated_at
 
     protected $fillable = [
@@ -25,7 +25,7 @@ class FtDocAuxiliar extends Model
 
     public function palletEntryExit()
     {
-        return $this->belongsTo(PalletEntryExit::class, 'IdDoc'); 
+        return $this->belongsTo(MovPalete::class, 'IdDoc'); 
     }
 
     public function getFromDateAttribute($value) {

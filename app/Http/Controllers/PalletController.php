@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
-use App\Models\PalletEntryExit;
-use App\Models\QtdPaleteDoc;
-use App\Models\QtdPaleteFisica;
+use App\Models\MovPalete;
+use App\Models\MovPaleteQtdDoc;
+use App\Models\MovPaleteQtdFisica;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use App\Models\FtDocAuxiliar;
+use App\Models\MovPaleteAnexoDoc;
+
 use Carbon\Carbon;
 
 class PalletController extends Controller
@@ -85,6 +86,7 @@ class PalletController extends Controller
                 "formData.CNPJDestinatario" => "required|string",
                 "formData.FilialRecebedoura" => "required|string",
                 "formData.DataRegistro" =>"required|date",
+                "formData.TpProc"=> "required|string",
 
                 "receivedDataDoc.PBR" => "required|numeric",
                 "receivedDataDoc.CHEP" => "required|numeric",
@@ -98,7 +100,7 @@ class PalletController extends Controller
             $consulta = DB::transaction(function () use ($req,$validated) {
           
                 
-                $palletEntry = PalletEntryExit::create([
+                $palletEntry = MovPalete::create([
                     'NrFun' => trim($req->user()->NrFun),
                     'NrDocumento' => trim($validated['formData']['NrDocumento']),
                     'NrSerie' => trim($validated['formData']['NrSerie']),
@@ -109,40 +111,42 @@ class PalletController extends Controller
                     'FilialRecebedoura' => trim($validated['formData']['FilialRecebedoura']),
                     'DataEmissaoDoc'=> Carbon::parse(Carbon::now())->format('d-m-Y H:i'),
                     'DataRegistro'=>Carbon::parse($validated['formData']['DataRegistro'])->format('d-m-Y H:i'),
+                    'TpProc'=>trim($validated['formData']['TpProc'])
+
                     //'created_at' => now(), // Melhor usar o now() para a data atual
                 ]);
                 
-                QtdPaleteDoc::create([
+                MovPaleteQtdDoc::create([
                     'IdDoc' => $palletEntry->IdDoc,
                     'TpPalet' => 'PBR',
                     'QtdPalete' => $validated['receivedDataDoc']['PBR']
                 ]);
                 
-                QtdPaleteDoc::create([
+                MovPaleteQtdDoc::create([
                     'IdDoc' => $palletEntry->IdDoc,
                     'TpPalet' => 'CHEP',
                     'QtdPalete' => $validated['receivedDataDoc']['CHEP']
                 ]);
                 
-                QtdPaleteDoc::create([
+                MovPaleteQtdDoc::create([
                     'IdDoc' => $palletEntry->IdDoc,
                     'TpPalet' => 'Descartavel',
                     'QtdPalete' => $validated['receivedDataDoc']['Descartavel']
                 ]);
                 
-                QtdPaleteFisica::create([
+                MovPaleteQtdFisica::create([
                     'IdDoc' => $palletEntry->IdDoc,
                     'TpPalet' => 'PBR',
                     'QtdPalete' => $validated['receivedDataFis']['PBR']
                 ]);
                 
-                QtdPaleteFisica::create([
+                MovPaleteQtdFisica::create([
                     'IdDoc' => $palletEntry->IdDoc,
                     'TpPalet' => 'CHEP',
                     'QtdPalete' => $validated['receivedDataFis']['CHEP']
                 ]);
                 
-                QtdPaleteFisica::create([
+                MovPaleteQtdFisica::create([
                     'IdDoc' => $palletEntry->IdDoc,
                     'TpPalet' => 'Descartavel',
                     'QtdPalete' => $validated['receivedDataFis']['Descartavel']
@@ -168,7 +172,7 @@ class PalletController extends Controller
             $caminho = $req->file('FotoDoc')->store('imagens', 'public');
 
             // Salvando apenas o caminho no banco
-            $imagem = FtDocAuxiliar::create([
+            $imagem = MovPaleteAnexoDoc::create([
                 "IdDoc"=>$req->IdDoc,
                 'FotoDoc' => $caminho,
                 'DataAtualizacao'=>"14-02-2025 15:30:00",
@@ -194,32 +198,5 @@ class PalletController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(PalletEntryExit $pallet)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(PalletEntryExit $pallet)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $req, PalletEntryExit $pallet)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(PalletEntryExit $pallet)
-    {
-        //
-    }
+   
 }

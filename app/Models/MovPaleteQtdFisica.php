@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 
-class QtdPaleteFisica extends Model
+class MovPaleteQtdFisica extends Model
 {
     use HasFactory;
 
-    protected $table = 'QtdFisica';
+    protected $table = 'MovPaleteQtdFisica';
     public $timestamps = false; // Mantém created_at e updated_at
 
     protected $fillable = [
@@ -21,7 +21,7 @@ class QtdPaleteFisica extends Model
 
     public function palletEntryExit()
     {
-        return $this->belongsTo(PalletEntryExit::class, 'IdDoc'); 
+        return $this->belongsTo(MovPalete::class, 'IdDoc'); 
     }
     protected $cast = [
         'QtdPalete'=>"integer",
