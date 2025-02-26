@@ -22,7 +22,10 @@ class MovPaleteQtdDoc extends Model
     {
         return $this->belongsTo(MovPalete::class, 'IdDoc'); 
     }
-    
+    public function vinculoPalete()
+    {
+        return $this->hasOne(MovVinculoNfSaidaEntrada::class, 'IdDoc'); 
+    }
     protected $cast = [
         'QtdPalete'=>"integer",
         'IdDoc' =>"integer",

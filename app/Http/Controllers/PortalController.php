@@ -10,7 +10,7 @@ class PortalController extends Controller {
             
             $filias = DB::connection('Portal')->select('select CDEMPRESA
         ,DSEMPRESA
-from softran_renovacao.dbo.SISEMPRE');
+from softran_renovacao.dbo.SISEMPRE');     
 
             
             return response()->json($filias);
@@ -28,6 +28,7 @@ from softran_renovacao.dbo.SISEMPRE');
 from softran_renovacao.dbo.SISCli
 where DsEntidade is not null
 and InAtivo = 0');
+
             return response()->json($destinatariosRemetentes);
 
         } catch (\Exception $error){

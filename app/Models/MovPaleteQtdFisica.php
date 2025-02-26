@@ -19,9 +19,13 @@ class MovPaleteQtdFisica extends Model
         'QtdPalete',
     ];
 
-    public function palletEntryExit()
+    public function palletEntryExit( )
     {
         return $this->belongsTo(MovPalete::class, 'IdDoc'); 
+    }
+        public function movPaleteAnexoDoc()
+    {
+        return $this->hasOne(MovPaleteSaldo::class, 'IdDoc');
     }
     protected $cast = [
         'QtdPalete'=>"integer",

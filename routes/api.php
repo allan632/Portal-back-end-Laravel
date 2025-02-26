@@ -39,7 +39,7 @@ Route::middleware('auth:api','profile:admin')->group(function () {
 
 Route::middleware('auth:api','profile:PalletController')->group(function () {
     Route::post('/register/entry/palletData',[PalletController::class, "registerEntryPallet"]);
-    Route::post('/register/entry/palletPhoto',[PalletController::class, "registerPhoto"]);
+    Route::post('/register/entry/palletPhoto',[PalletController::class, "registerPhotoDocAuxiliarEntry"]);
     Route::post('/test',[PalletController::class, "test"]);
     Route::get('/Portal/SearchFilias',[PortalController::class, "searchFilias"]);
     Route::get('/Portal/SearchDestinatariosRemetentes',[PortalController::class, "searchDestinatariosRemetentes"]);
