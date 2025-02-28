@@ -19,9 +19,44 @@ class PalletController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function consultRemetentEntryPallet(Request $req)
     {
+        try{
+
+        $validated = $req->validate([
+            "CNPJRemetente"=> "required|string",
+        ]);
+
+// Pegando os IdDoc conforme os critérios especificados
+$result = DB::table('MovPalete as mp')
+    ->join('MovPaleteSaldo as b', 'mp.IdDoc', '=', 'b.IdDocEntradaFisica')
+    ->select(
+        'mp.IdDoc',
+        'mp.NrDocumento',
+        'mp.NrSerie',
+        'mp.dataRegistro',
+        'b.QtdPalete',
+        'b.TpPalet'
+    )
+    ->where('mp.CNPJRemetente', $validated['CNPJRemetente'])
+    ->where('mp.TpProc', 'Entrada')
+    ->orderBy('mp.dataRegistro', 'asc')
+    ->get();
         //
+        //  CHEP  =  = 0 
+        //
+        $items = [
+            "IdDoc"=>$result[0]->IdDoc,
+            "NrDocumento"=>
+            $result[0]->TpPalet =>$result[0]->QtdPalete
+        ];
+        
+    return response()->json(['message'=> $items ],200);
+} catch(\Exception $e){
+    return response()->json(['error'=>$e ],422);
+
+}
+
     }
 
     // Formulario de Entrada
@@ -242,9 +277,32 @@ class PalletController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $req)
+
+     // { Registrar Saida}
+    public function registerExitPallet(Request $req)
     {
-        //
+        try{
+            //Valida tipo e se e requirido
+            $validated = $req->validate([
+                "formData.NrDocumento" => "required|string",
+                "formData.NrSerie" => "required|string",
+                "formData.TpDoc" => "required|string",
+                "formData.TpOperacao" => "required|string",
+                "formData.CNPJRemetente" => "required|string",
+                "formData.CNPJDestinatario" => "required|string",
+                "formData.FilialRecebedoura" => "required|string",
+                "formData.DataRegistro" =>"required|date",
+                "formData.TpProc"=> "required|string",
+            
+                'receivedDataFis'=> 'required|array',
+                'receivedDataFis.PBR*'=> "required|numeric",
+                'receivedDataFis.CHEP*'=> "required|numeric",
+                'receivedDataFis.Descartavel*'=> "required|numeric"
+            ]);
+            
+        } catch( \Exception $e){
+
+        }
     }
 
     /**

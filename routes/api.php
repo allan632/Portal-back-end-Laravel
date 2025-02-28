@@ -36,6 +36,7 @@ Route::middleware('auth:api','profile:admin')->group(function () {
     Route::put('/link/profile/user',[ProfileController::class, "linkProfileToUser"]);
 
 });
+Route::post('/consult/entry/palletData',[PalletController::class, "consultRemetentEntryPallet"]);
 
 Route::middleware('auth:api','profile:PalletController')->group(function () {
     Route::post('/register/entry/palletData',[PalletController::class, "registerEntryPallet"]);
@@ -43,6 +44,7 @@ Route::middleware('auth:api','profile:PalletController')->group(function () {
     Route::post('/test',[PalletController::class, "test"]);
     Route::get('/Portal/SearchFilias',[PortalController::class, "searchFilias"]);
     Route::get('/Portal/SearchDestinatariosRemetentes',[PortalController::class, "searchDestinatariosRemetentes"]);
+    Route::post('/register/Exit/palletData',[PalletController::class, "registerPhotoDocAuxiliarEntry"]);
 
 });
 
