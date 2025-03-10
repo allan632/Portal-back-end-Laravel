@@ -24,7 +24,7 @@ from softran_renovacao.dbo.SISEMPRE');
 
             
             $destinatariosRemetentes = DB::connection('Portal')->select('select CdInscricao
-        ,DsEntidade
+        ,DsEntidade 
 from softran_renovacao.dbo.SISCli
 where DsEntidade is not null
 and InAtivo = 0');

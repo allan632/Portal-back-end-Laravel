@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\MovPaleteAnexoDoc;
 use App\Models\MovPaleteSaldo;
+
+use App\Models\MovPaletereSaldo;
 use App\Models\MovVinculoNfSaidaEntrada;
 use Carbon\Carbon;
 use Faker\Core\Number;
@@ -29,29 +31,46 @@ class PalletController extends Controller
 
 // Pegando os IdDoc conforme os critérios especificados
 $result = DB::table('MovPalete as mp')
-    ->join('MovPaleteSaldo as b', 'mp.IdDoc', '=', 'b.IdDocEntradaFisica')
-    ->select(
-        'mp.IdDoc',
-        'mp.NrDocumento',
-        'mp.NrSerie',
-        'mp.dataRegistro',
-        'b.QtdPalete',
-        'b.TpPalet'
-    )
-    ->where('mp.CNPJRemetente', $validated['CNPJRemetente'])
-    ->where('mp.TpProc', 'Entrada')
-    ->orderBy('mp.dataRegistro', 'asc')
-    ->get();
-        //
+->join('MovPaleteSaldo as b', 'mp.IdDoc', '=', 'b.IdDocEntradaFisica')
+->select([
+    'mp.IdDoc',
+    'mp.NrDocumento',
+    'mp.NrSerie',
+    'mp.CNPJRemetente',
+    'mp.dataRegistro',
+    'b.QtdPalete',
+    'b.TpPalet'
+])
+->where('mp.CNPJRemetente', $validated['CNPJRemetente'])
+->where('mp.TpProc', 'Entrada')
+->whereIn('b.TpPalet', ['CHEP', 'Descartavel', 'PBR'])
+->whereExists(function ($query) {
+    $query->select(DB::raw(1))
+          ->from('MovPaleteSaldo')
+          ->whereRaw('MovPaleteSaldo.IdDocEntradaFisica = mp.IdDoc')
+          ->whereIn('TpPalet', ['CHEP', 'Descartavel', 'PBR'])
+          ->where('QtdPalete', '>', 0);
+})
+->get();
+
         //  CHEP  =  = 0 
         //
-        $items = [
-            "IdDoc"=>$result[0]->IdDoc,
-            "NrDocumento"=>
-            $result[0]->TpPalet =>$result[0]->QtdPalete
-        ];
+        $varip = [];
+        for ($i = 0; $i < \count($result) ; $i +=3) {
+            $items = [
+                "IdDoc"=>$result[$i]->IdDoc,
+                "NrDocumento"=>$result[$i]->NrDocumento,
+                "NrSerie"=>$result[$i]->NrSerie,
+                "dataRegistro"=>$result[0]->dataRegistro,
+                $result[$i]->TpPalet =>$result[$i]->QtdPalete,
+                $result[$i+1]->TpPalet =>$result[$i+1]->QtdPalete,
+                $result[$i+2]->TpPalet =>$result[$i+2]->QtdPalete,
+            ];
+            array_push($varip, $items);
+        };
+
         
-    return response()->json(['message'=> $items ],200);
+    return response()->json(['message'=> $varip ],200);
 } catch(\Exception $e){
     return response()->json(['error'=>$e ],422);
 
@@ -63,29 +82,10 @@ $result = DB::table('MovPalete as mp')
     public function test(Request $req)
     {
         try {
-            $validated = $req->validate([
-                "formData.NrDocumento" => "required|string",
-                "formData.NrSerie" => "required|string",
-                "formData.TpDoc" => "required|string",
-                "formData.TpOperacao" => "required|string",
-                "formData.CNPJRemetente" => "required|string",
-                "formData.CNPJDestinatario" => "required|string",
-                "formData.FilialRecebedoura" => "required|string",
-                "formData.DataRegistro" =>"required|date",
-                "receivedDataDoc.PBR" => "required|numeric",
-                "receivedDataDoc.CHEP" => "required|numeric",
-                "receivedDataDoc.Descartavel" => "required|numeric",
-                "formData.TpProc"=> "required|string",
-                'receivedDataFis'=> 'nullable|array',
-                'receivedDataFis.PBR*'=> "nullable|numeric",
-                'receivedDataFis.CHEP*'=> "nullable|numeric",
-                'receivedDataFis.Descartavel*'=> "nullable|numeric"
-            ]);
-            dump($validated['receivedDataFis']);
+            // //Valida tipo e se e requirido
+            //Valida tipo e se e requirido
 
 
-                dump($validated['receivedDataFis']);
-                dump($validated['receivedDataDoc']);
 
 
                 
@@ -113,16 +113,16 @@ $result = DB::table('MovPalete as mp')
             //Validar se o NRDocumento Existe retorna
 
 
-            $existe = MovPalete::where('TpProc', $validated["formData"]["TpProc"])
-            ->where('NrSerie', $validated["formData"]["NrSerie"])
-            ->where('NrDocumento', $validated["formData"]["NrDocumento"])
-            ->count() > 1; // Verifica se há mais de uma ocorrência
+            // $existe = MovPalete::where('TpProc', $validated["formData"]["TpProc"])
+            // ->where('NrSerie', $validated["formData"]["NrSerie"])
+            // ->where('NrDocumento', $validated["formData"]["NrDocumento"])
+            // ->count() > 1; // Verifica se há mais de uma ocorrência
             // if($existe){
             //     return  response()->json(["message"=>  "Essa entrada ja foi cadastrada"]);
             // }
 
 
-            return  response()->json(["message"=>  $validated['receivedDataDoc']]);
+            return  response()->json(['messagem'=>'sucesso']);
             
         } catch (\Throwable $e) {
             return  response()->json(["error"=> $e]);
@@ -191,10 +191,12 @@ $result = DB::table('MovPalete as mp')
                 ->count() > 0; // Considera duplicado apenas se houver mais de um
         
                 if ($existe) {
+
                     return response()->json([
-                        "message" => "Essa entrada já foi cadastrada."
+                        'message' => 'Essa saida já foi cadastrada.'
                     ], 409);
                 }
+    
 
                 $palletEntry = MovPalete::create([
                     'NrFun' => trim($req->user()->NrFun),
@@ -230,6 +232,7 @@ $result = DB::table('MovPalete as mp')
                 'TpPalet' => $tipo,
                 'QtdPalete' => $qtd
             ]);
+            
             MovPaleteSaldo::create([
                 'IdDocEntradaFisica' => $palletEntry->IdDoc,
                 'TpPalet' => $tipo,
@@ -240,10 +243,20 @@ $result = DB::table('MovPalete as mp')
 
         return $palletEntry->IdDoc;
     });
-    return response()->json([
-        "message" => "Documento cadastrado com sucesso.",
-        "IdDoc" => $consulta
-    ], 201);
+
+
+            
+
+            // Verifica se o retorno da transação é um response e o retorna diretamente
+            if ($consulta instanceof \Illuminate\Http\JsonResponse) {
+                return $consulta;
+            }
+
+            return response()->json([
+                "message" => "Documento cadastrado com sucesso.",
+                "IdDoc" => $consulta
+            ], 201);
+        
         } catch( \Exception $e) {
             return response()->json(["erro"=>$e], 402);
 
@@ -290,18 +303,102 @@ $result = DB::table('MovPalete as mp')
                 "formData.TpOperacao" => "required|string",
                 "formData.CNPJRemetente" => "required|string",
                 "formData.CNPJDestinatario" => "required|string",
-                "formData.FilialRecebedoura" => "required|string",
                 "formData.DataRegistro" =>"required|date",
                 "formData.TpProc"=> "required|string",
-            
                 'receivedDataFis'=> 'required|array',
-                'receivedDataFis.PBR*'=> "required|numeric",
-                'receivedDataFis.CHEP*'=> "required|numeric",
-                'receivedDataFis.Descartavel*'=> "required|numeric"
-            ]);
-            
-        } catch( \Exception $e){
+                'totalvalue'=>'required|array'
 
+            ]);
+
+
+           //se o receivedDataFis = receivedDataDoc ele pega os dados do doc
+           $consulta = DB::transaction(function () use ($req,$validated) {
+                      
+            $existe = MovPalete::where('TpProc', $validated["formData"]["TpProc"])
+            ->where('NrSerie', $validated["formData"]["NrSerie"])
+            ->where('NrDocumento', $validated["formData"]["NrDocumento"])
+            ->count() > 0; // Considera duplicado apenas se houver mais de um
+    
+            if ($existe) {
+
+                return response()->json([
+                    'message' => 'Essa saida já foi cadastrada.'
+                ], 409);
+            }
+
+            $palletEntry = MovPalete::create([
+                'NrFun' => trim($req->user()->NrFun),
+                'NrDocumento' => trim($validated['formData']['NrDocumento']),
+                'NrSerie' => trim($validated['formData']['NrSerie']),
+                'TpDoc' => trim($validated['formData']['TpDoc']),
+                'TpOperacao' => trim($validated['formData']['TpOperacao']),
+                'CNPJRemetente' => trim($validated['formData']['CNPJRemetente']),
+                'CNPJDestinatario' => trim($validated['formData']['CNPJDestinatario']),
+                'FilialRecebedoura' => '',
+                'DataEmissaoDoc'=> Carbon::parse(Carbon::now())->format('d-m-Y H:i'),
+                'DataRegistro'=>Carbon::parse($validated['formData']['DataRegistro'])->format('d-m-Y H:i'),
+                'TpProc'=>trim($validated['formData']['TpProc'])
+
+                //'created_at' => now(), // Melhor usar o now() para a data atual
+            ]);
+                     // Inserção dinâmica usando os próprios arrays validados
+        foreach ($validated['totalvalue'] as $tipo => $qtd) {
+            MovPaleteQtdDoc::create([
+                'IdDoc' => $palletEntry->IdDoc,
+                'TpPalet' => $tipo,
+                'QtdPalete' => $qtd
+            ]);
+        
+
+
+        }
+            foreach ($validated['receivedDataFis'] as $idDocEntradaFisica => $paletes) {
+                dump($idDocEntradaFisica);
+
+                foreach ($paletes as $tipoPalet => $quantidade) {
+                    if ($quantidade > 0) {
+                        $tipoPaletMap = [
+                            'devolDescartavel' => 'DESCARTAVEL',
+                            'devolCHEP' => 'CHEP',
+                            'devolPBR' => 'PBR'
+                        ];
+            
+                        if (isset($tipoPaletMap[$tipoPalet])) {
+                            dump($tipoPaletMap[$tipoPalet]);
+                            MovPaleteSaldo::where('IdDocEntradaFisica',$idDocEntradaFisica )
+                                ->where('TpPalet', $tipoPaletMap[$tipoPalet])
+                                ->decrement('QtdPalete', $quantidade);
+                            MovVinculoNfSaidaEntrada::create([
+                                'IdDocEntrada' => $palletEntry->IdDoc,
+                                'IdDocEntradaFisica' => $idDocEntradaFisica,
+                                'TpPaletEntrada' => $tipoPaletMap[$tipoPalet],
+                                'QtdPaleteSaldo'=> $quantidade
+                            ]);
+
+                        };
+
+
+                    }
+                }
+            }
+
+            return response()->json([
+                'message'=>'sucesso',
+                "IdDoc" => $palletEntry->IdDoc
+        ],201);
+        });
+
+                    // Verifica se o retorno da transação é um response e o retorna diretamente
+            if ($consulta instanceof \Illuminate\Http\JsonResponse) {
+                return $consulta;
+            }
+
+            return response()->json([
+                'message'=>'sucesso',
+                
+        ],201);
+        } catch( \Exception $e){
+            return response()->json(["error"=>$e],402);
         }
     }
 

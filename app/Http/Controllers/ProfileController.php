@@ -59,7 +59,7 @@ class ProfileController extends Controller
             'name'=>$req->nameProfile,
             'access_level'=>$req->accessLevel
         ]);
-
+        
         return response()->json(['message' => "perfil criado $profile",], 201);
     } catch(\Exception $e){
         return response()->json(['erro' => "$e",], 422);
