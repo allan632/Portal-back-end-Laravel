@@ -8,8 +8,8 @@ class PortalController extends Controller {
         try{
 
             
-            $filias = DB::connection('Portal')->select('select CDEMPRESA
-        ,DSEMPRESA
+            $filias = DB::connection('Portal')->select('SELECT TOP 100 CDEMPRESA
+        ,DSEMPRESA,NRCGCCPF
 from softran_renovacao.dbo.SISEMPRE');     
 
             
@@ -23,7 +23,7 @@ from softran_renovacao.dbo.SISEMPRE');
         try{
 
             
-            $destinatariosRemetentes = DB::connection('Portal')->select('select CdInscricao
+            $destinatariosRemetentes = DB::connection('Portal')->select('SELECT TOP 100 CdInscricao
         ,DsEntidade 
 from softran_renovacao.dbo.SISCli
 where DsEntidade is not null

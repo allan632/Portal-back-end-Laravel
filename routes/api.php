@@ -45,6 +45,8 @@ Route::middleware('auth:api','profile:PalletController')->group(function () {
     Route::get('/Portal/SearchFilias',[PortalController::class, "searchFilias"]);
     Route::get('/Portal/SearchDestinatariosRemetentes',[PortalController::class, "searchDestinatariosRemetentes"]);
     Route::post('/register/Exit/palletData',[PalletController::class, "registerExitPallet"]);
+    Route::post('/register/Exit/palletData',[PalletController::class, "registerExitPallet"]);
+    Route::post('/consult/Exit/PalletFilial', [PalletController::class, "CheckStorePalletFilial"]);
 
 });
 

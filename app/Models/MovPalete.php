@@ -21,6 +21,8 @@ class MovPalete extends Model
         'TpDoc',
         'TpOperacao',
         'CNPJRemetente',
+        'DsRemetente',
+        'DsDestinatario',
         'CNPJDestinatario',
         'FilialRecebedoura',
         'NrFun',

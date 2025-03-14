@@ -9,7 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\MovPaleteAnexoDoc;
 use App\Models\MovPaleteSaldo;
-
+use App\Models\MovPaleteSaldoFilial;
+use Illuminate\Database\QueryException;
 use App\Models\MovPaletereSaldo;
 use App\Models\MovVinculoNfSaidaEntrada;
 use Carbon\Carbon;
@@ -26,32 +27,32 @@ class PalletController extends Controller
         try{
 
         $validated = $req->validate([
-            "CNPJRemetente"=> "required|string",
+            "CNPJDestinatario"=> "required|string",
         ]);
 
-// Pegando os IdDoc conforme os critérios especificados
-$result = DB::table('MovPalete as mp')
-->join('MovPaleteSaldo as b', 'mp.IdDoc', '=', 'b.IdDocEntradaFisica')
-->select([
-    'mp.IdDoc',
-    'mp.NrDocumento',
-    'mp.NrSerie',
-    'mp.CNPJRemetente',
-    'mp.dataRegistro',
-    'b.QtdPalete',
-    'b.TpPalet'
-])
-->where('mp.CNPJRemetente', $validated['CNPJRemetente'])
-->where('mp.TpProc', 'Entrada')
-->whereIn('b.TpPalet', ['CHEP', 'Descartavel', 'PBR'])
-->whereExists(function ($query) {
-    $query->select(DB::raw(1))
-          ->from('MovPaleteSaldo')
-          ->whereRaw('MovPaleteSaldo.IdDocEntradaFisica = mp.IdDoc')
-          ->whereIn('TpPalet', ['CHEP', 'Descartavel', 'PBR'])
-          ->where('QtdPalete', '>', 0);
-})
-->get();
+        // Pegando os IdDoc conforme os critérios especificados
+        $result = DB::table('MovPalete as mp')
+        ->join('MovPaleteSaldo as b', 'mp.IdDoc', '=', 'b.IdDocEntradaFisica')
+        ->select([
+            'mp.IdDoc',
+            'mp.NrDocumento',
+            'mp.NrSerie',
+            'mp.CNPJDestinatario',
+            'mp.dataRegistro',
+            'b.QtdPalete',
+            'b.TpPalet'
+        ])
+        ->where('mp.CNPJDestinatario', $validated['CNPJDestinatario'])
+        ->where('mp.TpProc', 'Entrada')
+        ->whereIn('b.TpPalet', ['CHEP', 'Descartavel', 'PBR'])
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('MovPaleteSaldo')
+                ->whereRaw('MovPaleteSaldo.IdDocEntradaFisica = mp.IdDoc')
+                ->whereIn('TpPalet', ['CHEP', 'Descartavel', 'PBR'])
+                ->where('QtdPalete', '>', 0);
+        })
+        ->get();
 
         //  CHEP  =  = 0 
         //
@@ -77,7 +78,34 @@ $result = DB::table('MovPalete as mp')
 }
 
     }
+    /**
+     * Display a listing of the resource.
+     */
+    public function CheckStorePalletFilial(Request $req)
+    {
+        try{
 
+        $validated = $req->validate([
+            "Remetente"=> "required|string",
+        ]);
+
+        // Pegando os IdDoc conforme os critérios especificados
+        $result = DB::table('MovPaleteSaldoFilial')
+        ->select(['DsFilial','PBR', 'CHEP', 'Descartavel'])
+        ->where('Cnpj', $validated['Remetente'])
+        ->get();
+        if ($result->isEmpty()) {
+            return $result ="Nenhum registro encontrado.";
+        }
+
+        
+    return response()->json(['message'=> $result ],200);
+} catch(\Exception $e){
+    return response()->json(['error'=>$e ],422);
+
+}
+
+    }
     // Formulario de Entrada
     public function test(Request $req)
     {
@@ -143,6 +171,9 @@ $result = DB::table('MovPalete as mp')
                 "formData.TpOperacao" => "required|string",
                 "formData.CNPJRemetente" => "required|string",
                 "formData.CNPJDestinatario" => "required|string",
+                "formData.DsDestinatario" => "required|string",
+                "formData.DsRemetente" => "required|string",
+
                 "formData.FilialRecebedoura" => "required|string",
                 "formData.DataRegistro" =>"required|date",
                 "formData.TpProc"=> "required|string",
@@ -205,7 +236,9 @@ $result = DB::table('MovPalete as mp')
                     'TpDoc' => trim($validated['formData']['TpDoc']),
                     'TpOperacao' => trim($validated['formData']['TpOperacao']),
                     'CNPJRemetente' => trim($validated['formData']['CNPJRemetente']),
+                    'DsRemetente' => trim($validated['formData']['DsRemetente']),
                     'CNPJDestinatario' => trim($validated['formData']['CNPJDestinatario']),
+                    'DsDestinatario' => trim($validated['formData']['DsDestinatario']),
                     'FilialRecebedoura' => trim($validated['formData']['FilialRecebedoura']),
                     'DataEmissaoDoc'=> Carbon::parse(Carbon::now())->format('d-m-Y H:i'),
                     'DataRegistro'=>Carbon::parse($validated['formData']['DataRegistro'])->format('d-m-Y H:i'),
@@ -222,7 +255,10 @@ $result = DB::table('MovPalete as mp')
                 'QtdPalete' => $qtd
             ]);
         
-
+            MovPaleteSaldoFilial::where('IdFilial', $validated['formData']['FilialRecebedoura'])
+            ->update([
+                $tipo => DB::raw("$tipo + $qtd"),
+            ]);
 
         }
     
@@ -302,14 +338,18 @@ $result = DB::table('MovPalete as mp')
                 "formData.TpDoc" => "required|string",
                 "formData.TpOperacao" => "required|string",
                 "formData.CNPJRemetente" => "required|string",
+                "formData.FilialRecebedoura" => "required|string",
+                "formData.DsDestinatario" => "required|string",
+                "formData.DsRemetente" => "required|string",
+                
                 "formData.CNPJDestinatario" => "required|string",
                 "formData.DataRegistro" =>"required|date",
                 "formData.TpProc"=> "required|string",
-                'receivedDataFis'=> 'required|array',
-                'totalvalue'=>'required|array'
+                'receivedDataFis'=> 'required',
+                'totalvalue'=>'required'
 
             ]);
-
+            
 
            //se o receivedDataFis = receivedDataDoc ele pega os dados do doc
            $consulta = DB::transaction(function () use ($req,$validated) {
@@ -334,11 +374,12 @@ $result = DB::table('MovPalete as mp')
                 'TpOperacao' => trim($validated['formData']['TpOperacao']),
                 'CNPJRemetente' => trim($validated['formData']['CNPJRemetente']),
                 'CNPJDestinatario' => trim($validated['formData']['CNPJDestinatario']),
-                'FilialRecebedoura' => '',
+                'DsDestinatario' => trim($validated['formData']['DsDestinatario']),
+                'DsRemetente' => trim($validated['formData']['DsRemetente']),
+                'FilialRecebedoura' => trim($validated['formData']['FilialRecebedoura']),
                 'DataEmissaoDoc'=> Carbon::parse(Carbon::now())->format('d-m-Y H:i'),
                 'DataRegistro'=>Carbon::parse($validated['formData']['DataRegistro'])->format('d-m-Y H:i'),
                 'TpProc'=>trim($validated['formData']['TpProc'])
-
                 //'created_at' => now(), // Melhor usar o now() para a data atual
             ]);
                      // Inserção dinâmica usando os próprios arrays validados
@@ -348,12 +389,20 @@ $result = DB::table('MovPalete as mp')
                 'TpPalet' => $tipo,
                 'QtdPalete' => $qtd
             ]);
-        
+            dump($validated['formData']['CNPJRemetente']);
+            dump($tipo);
+
+            dump($qtd);
 
 
+            MovPaleteSaldoFilial::where('Cnpj', $validated['formData']['CNPJRemetente'])
+            ->update([
+                $tipo => DB::raw("$tipo - $qtd"),
+            ]);
         }
+
+        if($validated['formData']['TpOperacao'] === "DevolPalete"){
             foreach ($validated['receivedDataFis'] as $idDocEntradaFisica => $paletes) {
-                dump($idDocEntradaFisica);
 
                 foreach ($paletes as $tipoPalet => $quantidade) {
                     if ($quantidade > 0) {
@@ -364,7 +413,6 @@ $result = DB::table('MovPalete as mp')
                         ];
             
                         if (isset($tipoPaletMap[$tipoPalet])) {
-                            dump($tipoPaletMap[$tipoPalet]);
                             MovPaleteSaldo::where('IdDocEntradaFisica',$idDocEntradaFisica )
                                 ->where('TpPalet', $tipoPaletMap[$tipoPalet])
                                 ->decrement('QtdPalete', $quantidade);
@@ -381,7 +429,9 @@ $result = DB::table('MovPalete as mp')
                     }
                 }
             }
+        }
 
+           
             return response()->json([
                 'message'=>'sucesso',
                 "IdDoc" => $palletEntry->IdDoc
@@ -395,10 +445,21 @@ $result = DB::table('MovPalete as mp')
 
             return response()->json([
                 'message'=>'sucesso',
+                'data'=>$validated
                 
         ],201);
-        } catch( \Exception $e){
-            return response()->json(["error"=>$e],402);
+        }   catch (QueryException $e) {
+            // Verifica se o erro é de restrição CHECK (código 547)
+            if ($e->errorInfo[1] == 547) {
+                return response()->json([
+                    'error' => 'Operação inválida: a quantidade de paletes não pode ser negativa.'
+                ], 400);
+            }
+        
+            // Retorna erro genérico para outros problemas de banco
+            return response()->json([
+                'error' => 'Ocorreu um erro ao atualizar os dados.',
+            ], 500);
         }
     }
 
