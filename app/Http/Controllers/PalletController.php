@@ -8,11 +8,13 @@ use App\Models\MovPaleteQtdFisica;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\MovPaleteAnexoDoc;
+use App\Models\MovPaleteAnexoFisic;
+
 use App\Models\MovPaleteSaldo;
 use App\Models\MovPaleteSaldoFilial;
 use Illuminate\Database\QueryException;
 use App\Models\MovPaletereSaldo;
-use App\Models\MovVinculoNfSaidaEntrada;
+use App\Models\MovPaleteVinculoEntradaSaldoSaida;
 use Carbon\Carbon;
 use Faker\Core\Number;
 use Illuminate\Auth\Events\Validated;
@@ -311,9 +313,29 @@ class PalletController extends Controller
             $imagem = MovPaleteAnexoDoc::create([
                 "IdDoc"=>$req->IdDoc,
                 'FotoDoc' => $caminho,
-                'DataAtualizacao'=>"14-02-2025 15:30:00",
+                'DataAtualizacao'=>Carbon::now()->format('d-m-Y H:i:s'),
                 'NrFun'=>$req->user()->NrFun
 
+            ]);
+            return response()->json([
+                "Validacao"=> "sucesso"], 201);
+        } catch(\Exception $e){
+            return response()->json(["message"=>$e]);
+        }
+    }
+    public function registerPhotoPaleteAuxiliarEntry(Request $req){
+        try{
+
+
+            // Salva a imagem no diretório 'storage/app/public/imagens'
+            $caminho = $req->file('FotoDoc')->store('imagens', 'public');
+
+            // Salvando apenas o caminho no banco
+            $imagem = MovPaleteAnexoFisic::create([
+                "IdDoc"=>$req->IdDoc,
+                'FotoDoc' => $caminho,
+                'DataAtualizacao'=>Carbon::now()->format('d-m-Y H:i:s'),
+                'NrFun'=>$req->user()->NrFun
             ]);
             return response()->json([
                 "Validacao"=> "sucesso"], 201);
@@ -345,13 +367,13 @@ class PalletController extends Controller
                 "formData.CNPJDestinatario" => "required|string",
                 "formData.DataRegistro" =>"required|date",
                 "formData.TpProc"=> "required|string",
-                'receivedDataFis'=> 'required',
+                'receivedDataDoc'=> 'required',
                 'totalvalue'=>'required'
 
             ]);
             
 
-           //se o receivedDataFis = receivedDataDoc ele pega os dados do doc
+           //se o receivedDataDoc = receivedDataDoc ele pega os dados do doc
            $consulta = DB::transaction(function () use ($req,$validated) {
                       
             $existe = MovPalete::where('TpProc', $validated["formData"]["TpProc"])
@@ -389,10 +411,7 @@ class PalletController extends Controller
                 'TpPalet' => $tipo,
                 'QtdPalete' => $qtd
             ]);
-            dump($validated['formData']['CNPJRemetente']);
-            dump($tipo);
 
-            dump($qtd);
 
 
             MovPaleteSaldoFilial::where('Cnpj', $validated['formData']['CNPJRemetente'])
@@ -402,7 +421,7 @@ class PalletController extends Controller
         }
 
         if($validated['formData']['TpOperacao'] === "DevolPalete"){
-            foreach ($validated['receivedDataFis'] as $idDocEntradaFisica => $paletes) {
+            foreach ($validated['receivedDataDoc'] as $idDocEntradaFisica => $paletes) {
 
                 foreach ($paletes as $tipoPalet => $quantidade) {
                     if ($quantidade > 0) {
@@ -416,8 +435,8 @@ class PalletController extends Controller
                             MovPaleteSaldo::where('IdDocEntradaFisica',$idDocEntradaFisica )
                                 ->where('TpPalet', $tipoPaletMap[$tipoPalet])
                                 ->decrement('QtdPalete', $quantidade);
-                            MovVinculoNfSaidaEntrada::create([
-                                'IdDocEntrada' => $palletEntry->IdDoc,
+                            MovPaleteVinculoEntradaSaldoSaida::create([
+                                'IdDocSaida' => $palletEntry->IdDoc,
                                 'IdDocEntradaFisica' => $idDocEntradaFisica,
                                 'TpPaletEntrada' => $tipoPaletMap[$tipoPalet],
                                 'QtdPaleteSaldo'=> $quantidade

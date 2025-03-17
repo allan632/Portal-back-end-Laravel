@@ -47,6 +47,7 @@ Route::middleware('auth:api','profile:PalletController')->group(function () {
     Route::post('/register/Exit/palletData',[PalletController::class, "registerExitPallet"]);
     Route::post('/register/Exit/palletData',[PalletController::class, "registerExitPallet"]);
     Route::post('/consult/Exit/PalletFilial', [PalletController::class, "CheckStorePalletFilial"]);
+    Route::post('/register/exit/palletPhotoFisc',[PalletController::class, "registerPhotoPaleteAuxiliarEntry"]);
 
 });
 

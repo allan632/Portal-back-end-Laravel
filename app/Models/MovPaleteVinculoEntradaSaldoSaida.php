@@ -4,13 +4,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MovVinculoNfSaidaEntrada extends Model {
-    protected $table = 'VinculoEntradaSaldoEntrada';
+class MovPaleteVinculoEntradaSaldoSaida extends Model {
+    protected $table = 'MovPaleteVinculoEntradaSaldoSaida';
     public $incrementing = false; // Indica que a chave primária não é auto-incremento
     public $timestamps = false; // Se não houver `created_at` e `updated_at`
 
 
-    protected $fillable = ['IdDocEntrada', 'IdDocEntradaFisica', 'TpPaletEntrada','QtdPaleteSaldo'];
+    protected $fillable = ['IdDocSaida', 'IdDocEntradaFisica', 'TpPaletEntrada','QtdPaleteSaldo'];
 
     // Relacionamento com MovPalete
     public function movPalete() {

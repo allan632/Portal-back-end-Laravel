@@ -11,7 +11,7 @@ class MovPaleteAnexoFisic extends Model
 {
     use HasFactory;
 
-    protected $table = 'MovPaleteAnexoDoc';
+    protected $table = 'MovPaleteAnexoFisic';
     
     public $timestamps = false; // Mantém created_at e updated_at
 
