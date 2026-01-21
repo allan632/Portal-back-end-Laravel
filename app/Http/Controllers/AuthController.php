@@ -51,7 +51,7 @@ class AuthController extends Controller
     // Função de registro para salvar o usuário com a senha criptografada
     public function register(Request $request)
     {
-        $senhaOriginal = $request->input('DsSenha');
+        $senhaOriginal = $request->input('DsSenhaea');
         $encryptedPassword = $this->encryptPassword($senhaOriginal);
 
         $user = User::create([
